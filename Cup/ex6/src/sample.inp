@@ -1,7 +1,18 @@
-var x:int = 10
+var p, q: bool
+var x, y: int = 2+3
+var z: float
+p = (4 == 2+2)
+q = false
+z = 1.0
+if ( q | (!(p & q)) )
+x = 0
+while (x < y)
 for (var i: int = 0; i <= x; i = i+1)
-print i+1
-echo newline
+print x+1
 endfor
-
-
+echo newline
+x = x+1
+endwhile
+else
+echo z
+endif

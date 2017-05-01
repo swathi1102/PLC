@@ -61,16 +61,16 @@ procstatements  ::= mainproc:main{:
                         RESULT = main;
                      :};
 
-mainproc        ::= PROC MAIN LPAREN RPAREN statement:s ENDPROC{:
+mainproc        ::= PROC MAIN LPAREN RPAREN statement_block:s ENDPROC{:
                         
                         RESULT = new Lstat(s);
                     :};
 
-procd        ::=    PROC ID:id PARA:p statement:s ENDPROC {:
+procd        ::=    PROC ID:id PARA:p statement_block:s ENDPROC {:
 
                         RESULT = Astat.makeFunc(id,p,s);
                     :}
-                    |PROC ID:id LPAREN RPAREN statement:s ENDPROC{:
+                    |PROC ID:id LPAREN RPAREN statement_block:s ENDPROC{:
                        
                         RESULT = Astat.makeFunc(id,s);
                     :};

@@ -62,7 +62,8 @@ public class Astat {
         return statement;
     }
        Astat assState = null;
-    public static Astat makeFunc(String id,Lstat para,Astat state ){
+    
+       public static Astat makeFunc(String id,Lstat para,Astat state ){
         Astat statement = new Astat();
         
         statement.assVariable = id;        
