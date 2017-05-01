@@ -1,9 +1,7 @@
-var x: int = 10
+var x:int = 10
+for (var i: int = 0; i <= x; i = i+1)
+print i+1
+echo newline
+endfor
 
-var y: int = 5
-while(!(y>x))
-    echo y
-    echo newline
-    y = y+1
-    
-endwhile
+

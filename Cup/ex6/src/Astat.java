@@ -18,6 +18,7 @@ public class Astat {
     public static int forloop = 10;
     public static int param = 11;
     public static int echo = 12;
+    public static int newline = 13;
     /*
      * assignment statement: variable = expr
      *
@@ -259,7 +260,11 @@ public class Astat {
         return statement;
 
     }
-    
+    public static Astat newline(){
+        Astat statement = new Astat();
+        statement.statementType = newline;
+        return statement;
+    }
 
     /*
      * block statement: begin statement_list end
@@ -321,14 +326,17 @@ public class Astat {
                         SymbolTable.setValue(assVariable, ht2);
                     }
                     break;
-                case "newline":
-                    System.out.print("\n");break;
+          
                 default:
                     System.out.println("Type mismatch");
                     System.exit(0);
                     break;
             }
-        } else if(statementType == varDeclarationAndType){
+        } 
+        else if(statementType == newline){
+            System.out.println("");
+        } 
+        else if(statementType == varDeclarationAndType){
             for(Astat s: asslist.statementList)
             {   
                 HashMap<String,Object> ht = new HashMap();

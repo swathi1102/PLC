@@ -14,7 +14,7 @@ non terminal Object             program;
 non terminal Astat              proccall,statement,statement_block, assignment, ifthen, print, while, statement_part,for,DECLARATION,echo;
 non terminal Lstat              statement_list, ID_LIST, PARA, PARADEC, procstatements,ARGS,nstatements,statement_type,mainproc;
 non terminal Aexp               expr, factor, term , logic;
-non terminal String             TYPE,newline;
+non terminal String             TYPE;
 non terminal                    procd;
 
 precedence right                NOT;
@@ -146,10 +146,9 @@ print           ::= PRINT logic:e
 
 echo           ::= ECHO logic:e
                     {: RESULT = Astat.echo(e); :}
-                   | ECHO newline:n
-                   {: RESULT = Astat.param(n,n); :}
+                   | ECHO NEWLINE
+                   {: RESULT = Astat.newline(); :}
              ;
-newline        ::= NEWLINE {: RESULT = "newline"; :};
 
 ifthen          ::= IF logic:e statement_block:s ELSE statement_block:s2 ENDIF
                     {: RESULT = Astat.ifthen(e,s,s2); :}
