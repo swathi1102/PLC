@@ -445,14 +445,16 @@ public class Astat {
             }
         } 
         else if (statementType == forloop) {
+            forDeclaration.execute();
             for (;;) {
-                forDeclaration.execute();
+                
                 if (forCondition.getValue().get("bool") == java.lang.Boolean.TRUE) {
                     ForBody.execute();
+                    forUpdate.execute();
                 } else {
                     break;
                 }
-                forUpdate.execute();
+               
             }
             
         }else if (statementType == print) {
