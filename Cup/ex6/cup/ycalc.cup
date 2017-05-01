@@ -1,0 +1,209 @@
+package src;
+import java_cup.runtime.*;
+
+
+terminal           SEMI,PLUS, MINUS, TIMES, DIVIDE, LPAREN, RPAREN, EQ, 
+                   IF,ELSE, ENDIF, PRINT, WHILE,  ENDWHILE, INT, BOOL, FOR,ENDFOR,
+                   FLOAT, COLON, COMMA, VAR, LT, LTE, GT, GTE, EQEQ, NEQ,PROC,ENDPROC,MAIN,NOT,AND, OR,ECHO,NEWLINE;
+terminal Integer   NUMBER;
+terminal Float     FLOATINGNUMBER;
+terminal Boolean    BOOLEAN;
+terminal String    ID;
+
+non terminal Object             program;
+non terminal Astat              proccall,statement,statement_block, assignment, ifthen, print, while, statement_part,for,DECLARATION,echo;
+non terminal Lstat              statement_list, ID_LIST, PARA, PARADEC, procstatements,ARGS,nstatements,statement_type,mainproc;
+non terminal Aexp               expr, factor, term , logic;
+non terminal String             TYPE,newline;
+non terminal                    procd;
+
+precedence right                NOT;
+
+program         ::= statement_type:s {:  s.execute(); :};
+
+DECLARATION     ::= VAR ID_LIST:id_list COLON TYPE:type EQ logic:e   {:
+                       RESULT = Astat.declaration(id_list,type,e);
+                    :} 
+                    | VAR ID_LIST:id_list COLON TYPE:type
+                    {:
+                       RESULT = Astat.declaration(id_list,type);
+                    :};
+
+ID_LIST         ::= ID_LIST:id_list COMMA ID:id
+                    {:
+                       RESULT = new Lstat(id_list,Astat.makeId(id));
+                    :};
+
+ID_LIST         ::= ID:id    
+                    {:
+                        RESULT = new Lstat(Astat.makeId(id));
+                    :};
+
+TYPE            ::= INT {: RESULT = "int"; :}| FLOAT {: RESULT = "float"; :}| BOOL{: RESULT = "bool"; :};
+
+statement_type  ::= nstatements:ns{:
+                        RESULT = ns;
+                    :}
+                    | procstatements:ps{:
+
+                        RESULT = ps;
+                    :};
+
+nstatements     ::= statement_list:s {: 
+                        RESULT = s;
+                    :};
+                    
+
+procstatements  ::= mainproc:main{:
+                        RESULT = main;
+                    :}
+                    | procd mainproc:main{:
+                        RESULT = main;
+                     :};
+
+mainproc        ::= PROC MAIN LPAREN RPAREN statement:s ENDPROC{:
+                        
+                        RESULT = new Lstat(s);
+                    :};
+
+procd        ::=    PROC ID:id PARA:p statement:s ENDPROC {:
+
+                        RESULT = Astat.makeFunc(id,p,s);
+                    :}
+                    |PROC ID:id LPAREN RPAREN statement:s ENDPROC{:
+                       
+                        RESULT = Astat.makeFunc(id,s);
+                    :};
+
+PARA             ::= LPAREN PARADEC:para RPAREN{:
+                        RESULT = para;
+                    :};
+
+PARADEC          ::= PARADEC:p COMMA ID:id COLON TYPE:type  {:
+                        RESULT = new Lstat(p,Astat.param(id,type));
+                     :}
+                     | ID:id COLON TYPE:type {:
+                        RESULT = new Lstat(Astat.param(id,type));
+                     :};
+
+statement_list  ::= statement_list:l statement_part:s
+                    {: RESULT = new Lstat(l,s) ; :}
+                |   statement_part:s
+                    {: RESULT = new Lstat(s); :}
+                ;
+
+statement_part  ::= statement:s
+                    {: RESULT = s; :}
+                ;
+
+statement       ::= DECLARATION:d{:  RESULT = d;:}
+                |assignment:s
+                    {: RESULT = s; :}
+                | ifthen:s
+                    {: RESULT = s; :}
+                | print:s
+                    {: RESULT = s; :}
+                | echo:s
+                    {: RESULT = s; :}
+                | while:s
+                    {: RESULT = s; :}
+                | for:f 
+                    {: RESULT = f; :}
+                | proccall:pc{:
+                    RESULT = pc;
+                :};
+statement_block ::=  statement_list:s
+                    {: RESULT = Astat.block(s); :};
+proccall        ::= ID:id LPAREN ARGS:args RPAREN{:
+
+                        RESULT = Astat.callFunction(id,args);
+                    :}
+                    | ID:id LPAREN RPAREN{:
+
+                        RESULT = Astat.callFunction(id);
+                    :};
+
+
+ARGS            ::= ARGS:arg COMMA logic:e
+                    {:
+                       RESULT = new Lstat(arg,Astat.setarg(e));
+                    :}
+                    | logic:e  {:
+                        RESULT = new Lstat(Astat.setarg(e));
+                    :};
+
+while           ::= WHILE logic:e statement_block:s ENDWHILE
+                    {: RESULT = Astat.whileloop(e,s); :}
+                ;
+
+for             ::= FOR LPAREN DECLARATION :d SEMI logic:l SEMI statement:s RPAREN statement_block:s1 ENDFOR{:
+                       RESULT = Astat.forloop(d,l,s,s1);
+                    :};
+
+print           ::= PRINT logic:e
+                    {: RESULT = Astat.print(e); :}
+                ;
+
+echo           ::= ECHO logic:e
+                    {: RESULT = Astat.echo(e); :}
+                   | ECHO newline:n
+                   {: RESULT = Astat.param(n,n); :}
+             ;
+newline        ::= NEWLINE {: RESULT = "newline"; :};
+
+ifthen          ::= IF logic:e statement_block:s ELSE statement_block:s2 ENDIF
+                    {: RESULT = Astat.ifthen(e,s,s2); :}
+                    | IF logic:e statement_block:s ENDIF
+                    {: RESULT = Astat.ifthen(e,s); :};
+
+
+assignment      ::= ID:i EQ logic:e
+                    {: RESULT = Astat.assignment(i,e); :}
+                ;
+
+logic           ::= logic:e LT expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.LT); :}
+                    | logic:e LTE expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.LTE); :}
+                    | logic:e GT expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.GT); :}
+                    | logic:e GTE expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.GTE); :}
+                    | logic:e EQEQ expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.EQEQ); :}
+                    | logic:e NEQ expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.NEQ); :}
+                    | logic:e AND expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.AND); :}
+                    | logic:e OR expr:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.OR); :}
+                    | NOT logic:e
+                    {: RESULT = new Aexp(new Args(e,null), sym.NOT); :}
+                    | expr:e    {: RESULT = e; :}
+                    ;
+                    
+expr            ::= expr:e PLUS term:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.PLUS); :}
+                | expr:e MINUS term:t
+                    {: RESULT = new Aexp(new Args(e,t), sym.MINUS); :}
+                |term:t
+                    {: RESULT = t; :};
+
+term            ::= term:t TIMES factor:f
+                    {: RESULT = new Aexp(new Args(t,f), sym.TIMES); :}
+                | term:t DIVIDE factor:f
+                    {: RESULT = new Aexp(new Args(t,f), sym.DIVIDE); :}
+                | factor:f
+                    {: RESULT = f; :};
+
+factor          ::=
+                    LPAREN logic:e RPAREN
+                    {: RESULT = e; :}
+                    | NUMBER:n
+                    {: RESULT = new Aexp(n); :}
+                | ID:i
+                    {: RESULT = new Aexp(i); :}
+                | FLOATINGNUMBER:fn
+                    {: RESULT = new Aexp(fn); :}
+                | BOOLEAN:b
+                    {: RESULT = new Aexp(b); :};

@@ -1,0 +1,9 @@
+var x: int = 10
+
+var y: int = 5
+while(!(y>x))
+    echo y
+    echo newline
+    y = y+1
+    
+endwhile

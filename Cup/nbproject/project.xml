@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://www.netbeans.org/ns/project/1">
+    <type>org.netbeans.modules.java.j2seproject</type>
+    <configuration>
+        <data xmlns="http://www.netbeans.org/ns/j2se-project/3">
+            <name>CUP</name>
+            <source-roots>
+                <root id="src.demonstrationCUP.dir"/>
+                <root id="src.ex1.dir"/>
+                <root id="src.ex2.dir"/>
+                <root id="src.ex3.dir"/>
+                <root id="src.ex4.dir"/>
+                <root id="src.ex5.dir"/>
+                <root id="src.ex6.dir"/>
+            </source-roots>
+            <test-roots/>
+        </data>
+    </configuration>
+</project>
